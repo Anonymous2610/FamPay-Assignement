@@ -100,7 +100,5 @@ def get_latest_videos(query="cricket",max_results=10):
         else:
             # Handle other HTTP errors
             print(f"HTTP error {error_code}: {error_content}")
-            break  # Exit the loop if it's not a quota issue
-        print(f"HTTP error {error_code}: {error_content}")
         return
 
