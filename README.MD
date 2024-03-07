@@ -93,7 +93,7 @@ These instructions will guide you on how to set up and run the project on your l
 5. **Run the Celery worker:**
 
     ```bash
-    celery -A fampay worker -l info
+    celery -A fampay worker -l info -P solo
     ```
 
 6. **Run the Celery Beat scheduler:**
