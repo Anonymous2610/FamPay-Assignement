@@ -69,7 +69,7 @@ These instructions will guide you on how to set up and run the project on your l
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/fampay-youtube-api.git
+    https://github.com/Anonymous2610/FamPay-Assignement.git
     ```
 
 2. **Navigate to the project directory:**
