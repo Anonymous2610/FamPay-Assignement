@@ -6,16 +6,14 @@
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
-import django
+from api.models import YoutubeVideos, APIKeys
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Fampay.settings')
-django.setup()
 def get_last_published_time():
-    from api.models import APIKeys, YoutubeVideos
+
     latest_video = YoutubeVideos.objects.order_by('-publish_time').first()
+
     # Calculate 'publishedAfter' parameter
     if latest_video:
         published_after = latest_video.publish_time
@@ -23,13 +21,20 @@ def get_last_published_time():
         # If no videos are stored, fetch videos from the last 24 hours
         published_after = datetime.utcnow() - timedelta(days=1)
 
-    # Format 'publishedAfter' as required by the YouTube API
-    published_after_str = published_after.isoformat() + 'Z'
+    # Ensure 'published_after' is in UTC
+    published_after = published_after.replace(tzinfo=timezone.utc)
+
+    # Format 'published_after' as required by the YouTube API
+    published_after_str = published_after.isoformat()
+    
+    # Remove the timezone offset information
+    published_after_str = published_after_str[:-6] + 'Z'
+    
     return published_after_str
 
 
 def save_youtube_video(data):
-    from api.models import APIKeys, YoutubeVideos
+
     video_id = data['id']['videoId']
     title = data['snippet']['title']
     description = data['snippet']['description']
@@ -49,8 +54,9 @@ def save_youtube_video(data):
 
     return video, created
 
-def main(query,max_results=10):
-    from api.models import APIKeys, YoutubeVideos
+def get_latest_videos(query="cricket",max_results=10):
+
+    
     API_KEY = APIKeys.objects.filter(quota_limit_reached=False).first()
     if API_KEY == None:
         print("All API keys are exhausted. Add new API keys")
@@ -66,7 +72,7 @@ def main(query,max_results=10):
         q=query,
         part="snippet",
         order="date",
-        publishedAfter= time,
+        publishedAfter=time,
         maxResults=max_results,
         type="video"
     )
@@ -86,7 +92,3 @@ def main(query,max_results=10):
         print(f"HTTP error {error_code}: {error_content}")
         return
 
-
-if __name__ == "__main__":
-    query = "cricket"
-    main(query)
