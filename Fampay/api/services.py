@@ -87,8 +87,20 @@ def get_latest_videos(query="cricket",max_results=10):
                 print(f"Video already exists: {video}")
         return
     except HttpError as e:
+
+
         error_code = e.resp.status
         error_content = e.content.decode("utf-8")
+        # Check for quota-related errors
+        if error_code == 403 and "quotaexceeded" in error_content.lower():
+            APIKey_obj = APIKeys.objects.filter(key = API_KEY)
+            APIKey_obj.quota_limit_reached = True
+            APIKey_obj.save()
+            print(f"API Key {API_KEY} is exhausted. Switching to the next key.")
+        else:
+            # Handle other HTTP errors
+            print(f"HTTP error {error_code}: {error_content}")
+            break  # Exit the loop if it's not a quota issue
         print(f"HTTP error {error_code}: {error_content}")
         return
 
