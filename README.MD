@@ -75,7 +75,7 @@ These instructions will guide you on how to set up and run the project on your l
 2. **Navigate to the project directory:**
 
     ```bash
-    cd fampay-youtube-api
+    cd Fampay
     ```
 
 3. **Install dependencies:**
